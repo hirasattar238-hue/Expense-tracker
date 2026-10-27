@@ -1,0 +1,270 @@
+
+/* 1. Basic reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0b1120;
+  --card: #151e30;
+  --border: #283449;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --green: #34d399;
+  --green-dark: #059669;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+/* 2. Header */
+.header {
+  max-width: 1100px;
+  margin: 0 auto 35px;
+}
+
+.header h1 {
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+
+.header h1 span {
+  color: var(--green);
+}
+
+.header p {
+  color: var(--muted);
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* 3. Main layout */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 4. Summary cards */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--green);
+}
+
+.summary-card p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.summary-card h2 {
+  font-size: 27px;
+  overflow-wrap: anywhere;
+}
+
+.balance {
+  background: linear-gradient(135deg, #12382f, #151e30);
+}
+
+.balance h2 {
+  color: var(--green);
+}
+
+/* 5. Form and history panels */
+.transaction-section,
+.history-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.transaction-section h2,
+.history-section h2 {
+  font-size: 20px;
+  margin-bottom: 22px;
+}
+
+/* 6. Form fields */
+#transaction-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+
+#transaction-form label {
+  color: var(--muted);
+  font-size: 13px;
+  align-self: end;
+}
+
+#transaction-form input,
+#transaction-form select {
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font: inherit;
+  outline: none;
+}
+
+#transaction-form input:focus,
+#transaction-form select:focus {
+  border-color: var(--green);
+}
+
+#transaction-form button {
+  grid-column: 1 / -1;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--green);
+  color: #07130f;
+  border: none;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#transaction-form button:hover {
+  background: #6ee7b7;
+}
+
+/* 7. Transaction list */
+#transaction-list {
+  list-style: none;
+}
+
+#transaction-list li {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+#transaction-list li:last-child {
+  border-bottom: none;
+}
+
+.empty-message {
+  color: var(--muted);
+  text-align: center;
+}
+
+/* 8. Mobile responsive design */
+@media (max-width: 650px) {
+  body {
+    padding: 24px 14px;
+  }
+
+  .header {
+    margin-bottom: 25px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 20px;
+  }
+
+  .summary-card h2 {
+    font-size: 24px;
+  }
+
+  .transaction-section,
+  .history-section {
+    padding: 20px 16px;
+  }
+
+  #transaction-form {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  #transaction-form button {
+    grid-column: auto;
+    margin-top: 10px;
+  }
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.transaction-info {
+  flex: 1;
+  min-width: 120px;
+}
+
+.transaction-info strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.transaction-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.transaction-amount {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.income-amount {
+  color: var(--green);
+}
+
+.expense-amount {
+  color: #fb7185;
+}
+
+.delete-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: #fb7185;
+  padding: 8px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #321d2a;
+}
+

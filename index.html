@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+   <link rel="stylesheet" href="css/style.css">
+    <title>Document</title>
+</head>
+<body>
+   <header class="header">
+    <h1>SpendWise<span>.</span></h1>
+    <p>Manage your money, simpley</p>
+   </header> 
+   <main class="container">
+    <section class="summary">
+        <div class="summary-card balance">
+        <p>Total Balance</p>
+        <h2 id="balance">Rs 0</h2>
+        </div>
+        <div class="summary-card">
+            <p>Total Expenses</p>
+            <h2 id="expenses">Rs 0</h2>
+        </div>
+    </section>
+    <section class="transaction-section">
+        <h2>Add Transaction</h2>
+        <form id="transaction-form">
+            <label for="title">Transaction Name</label>
+            <input type="text"
+            id="title"
+            placeholder="e.g.books"
+            required>
+            <label for="amount">Amount (Rs)
+            </label>
+            <input type="number"
+            id="amount"
+            placeholder="Enter amount"
+            min="1"
+            step="0.1"
+            required
+            >
+            <label for="type">Transaction Type</label>
+            <select id="type" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+            </select>
+            <label for="category">Category</label>
+            <select  id="category"required>
+                <option value="education">Education</option>
+                 <option value="food">Food</option>
+                  <option value="transport">Transport</option>
+                   <option value="shoping">Shopping</option>
+                    <option value="other">Other</option>
+            </select>
+            <button type="submit">Add Transaction</button>
+        </form>
+    </section>
+    <section class="history-section">
+        <h2>Recent Transations</h2>
+        <ul id="transaction-list">">
+            <li class="empty-message">NO Transaction yet.</li>
+        </ul>
+    </section>
+
+
+   </main>
+  <script>
+    
+const form = document.getElementById("transaction-form");
+
+const titleInput = document.getElementById("title");
+const amountInput = document.getElementById("amount");
+const typeInput = document.getElementById("type");
+const categoryInput = document.getElementById("category");
+
+const balanceElement = document.getElementById("balance");
+const expensesElement = document.getElementById("expenses");
+const transactionList = document.getElementById("transaction-list");
+
+// Load saved transactions from the browser
+let transactions = [];
+
+try {
+  const savedTransactions = localStorage.getItem("spendwise-transactions");
+
+  if (savedTransactions) {
+    const parsedTransactions = JSON.parse(savedTransactions);
+
+    if (Array.isArray(parsedTransactions)) {
+      transactions = parsedTransactions.filter(
+        (item) =>
+          item &&
+          typeof item.id === "string" &&
+          typeof item.title === "string" &&
+          Number.isFinite(item.amount) &&
+          item.amount > 0 &&
+          ["income", "expense"].includes(item.type) &&
+          typeof item.category === "string" &&
+          typeof item.date === "string"
+      );
+    }
+  }
+} catch (error) {
+  console.log("Could not load saved transactions.");
+}
+
+// Format amounts in Pakistani rupees
+function formatCurrency(amount) {
+  return (
+    "Rs " +
+    amount.toLocaleString("en-PK", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+}
+
+// Save transactions in the browser
+function saveTransactions() {
+  try {
+    localStorage.setItem(
+      "spendwise-transactions",
+      JSON.stringify(transactions)
+    );
+  } catch (error) {
+    alert("Your browser could not save the data.");
+  }
+}
+
+// Calculate income, expenses and balance
+function updateSummary() {
+  const totalIncome = transactions
+    .filter((item) => item.type === "income")
+    .reduce((total, item) => total + item.amount, 0);
+
+  const totalExpenses = transactions
+    .filter((item) => item.type === "expense")
+    .reduce((total, item) => total + item.amount, 0);
+
+  const balance = totalIncome - totalExpenses;
+
+  balanceElement.textContent = formatCurrency(balance);
+  expensesElement.textContent = formatCurrency(totalExpenses);
+}
+
+// Display all transactions
+function renderTransactions() {
+  transactionList.replaceChildren();
+
+  if (transactions.length === 0) {
+    const message = document.createElement("li");
+    message.className = "empty-message";
+    message.textContent = "No transactions yet. Add your first transaction.";
+    transactionList.appendChild(message);
+    return;
+  }
+
+  transactions
+    .slice()
+    .reverse()
+    .forEach((transaction) => {
+      const item = document.createElement("li");
+      item.className = "transaction-item";
+
+      const info = document.createElement("div");
+      info.className = "transaction-info";
+
+      const title = document.createElement("strong");
+      title.textContent = transaction.title;
+
+      const details = document.createElement("p");
+      details.className = "transaction-meta";
+      details.textContent =
+        transaction.category + " • " + transaction.date;
+
+      info.append(title, details);
+
+      const amount = document.createElement("span");
+      amount.className =
+        "transaction-amount " +
+        (transaction.type === "income"
+          ? "income-amount"
+          : "expense-amount");
+
+      const sign = transaction.type === "income" ? "+" : "−";
+      amount.textContent = sign + formatCurrency(transaction.amount);
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "delete-btn";
+      deleteButton.textContent = "Delete";
+
+      deleteButton.addEventListener("click", () => {
+        transactions = transactions.filter(
+          (item) => item.id !== transaction.id
+        );
+
+        saveTransactions();
+        updateSummary();
+        renderTransactions();
+      });
+
+      item.append(info, amount, deleteButton);
+      transactionList.appendChild(item);
+    });
+}
+
+// Add a new transaction
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const title = titleInput.value.trim();
+  const amount = Number(amountInput.value);
+
+  if (
+    !title ||
+    !Number.isFinite(amount) ||
+    amount <= 0 ||
+    !["income", "expense"].includes(typeInput.value)
+  ) {
+    alert("Please enter a valid name and amount.");
+    return;
+  }
+
+  const transaction = {
+    id: Date.now().toString() + Math.random().toString(16).slice(2),
+    title: title,
+    amount: amount,
+    type: typeInput.value,
+    category: categoryInput.value,
+    date: new Date().toLocaleDateString(),
+  };
+
+  transactions.push(transaction);
+
+  saveTransactions();
+  updateSummary();
+  renderTransactions();
+
+  form.reset();
+  typeInput.value = "expense";
+});
+
+// Show saved data when the page opens
+updateSummary();
+renderTransactions();
+
+  </script>
+</body>
+</html>
